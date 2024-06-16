@@ -1,5 +1,6 @@
 import torch
 import matplotlib.pyplot as plt
+from model import LinearRegressionModel
 
 
 def print_pytorch_ver():
@@ -26,7 +27,7 @@ def plot_predictions(train_data,
 
     # Plot predictions if they exists
     if predictions is not None:
-        plt.scatter(test_data, predictions)
+        plt.scatter(test_data, predictions, c="r")
 
     # Legend
     plt.legend(prop={"size":14})
@@ -53,3 +54,18 @@ if __name__ == '__main__':
     X_test, y_test = X[train_split:], y[train_split:]
     # print(len(X_train), len(y_train), len(X_test), len(y_test))  # 40 40 10 10
     plot_predictions(X_train, y_train, X_test, y_test, None)
+
+    # Manual seed
+    torch.manual_seed(42)
+
+    # Instance of the model
+    model_0 = LinearRegressionModel()
+    print(model_0.state_dict())
+
+    # Make predictions with model
+    with torch.inference_mode():
+        y_preds = model_0(X_test)
+
+    print(y_preds, y_test)
+    plot_predictions(X_train, y_train, X_test, y_test, predictions=y_preds)
+
