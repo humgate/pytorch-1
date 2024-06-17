@@ -5,7 +5,7 @@
 #
 # It will use two main algorithms:
 # 1. Gradient descent
-# Back propagation
+# 2. Back propagation
 import torch
 from torch import nn
 
