@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torch import nn
 
@@ -38,8 +39,13 @@ if __name__ == '__main__':
     optimizer = torch.optim.SGD(params=model_0.parameters(),
                                 lr=0.01)  # learning rate == step size - how big are optimizer parameters changes
 
+    # Interesting data to collect and review about the model training process
+    epoch_count = []
+    loss_values = []
+    test_loss_values = []
+
     # Training
-    epochs = 150  # An epoch is one single loop through the data
+    epochs = 200  # An epoch is one single loop through the data
     # 0. Loop through the data
     for epoch in range(epochs):
         model_0.train()  # gradient tracking on
@@ -66,6 +72,12 @@ if __name__ == '__main__':
             test_preds = model_0(X_test)
             test_loss = loss_fn(test_preds, y_test)
         if epoch % 10 == 0:
+            epoch_count.append(epoch)
+            loss_values.append(loss)
+            test_loss_values.append(test_loss)
             print(f"Epoch: {epoch} | Test: {loss} | Test loss: {test_loss}")
 
     Plotter.plot_predictions(X_train, y_train, X_test, y_test, predictions=test_preds)
+    Plotter.plot_loss_curves(epoch_count,
+                             np.array(torch.tensor(loss_values).numpy()),
+                             np.array(torch.tensor(test_loss_values).numpy()))

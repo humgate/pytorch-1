@@ -22,8 +22,21 @@ class Plotter:
 
         # Plot predictions if they exists
         if predictions is not None:
-            plt.scatter(test_data, predictions, c="r")
+            plt.scatter(test_data, predictions, c="r", s=4, label="Prediction")
 
         # Legend
         plt.legend(prop={"size": 14})
+        plt.show()
+
+    @staticmethod
+    def plot_loss_curves(epoch_count,
+                         loss_values,
+                         test_loss_values
+                         ):
+        plt.plot(epoch_count, loss_values, label ="Train loss")
+        plt.plot(epoch_count, test_loss_values, label="Test loss")
+        plt.title("Training and test loss curves ")
+        plt.xlabel("Epochs")
+        plt.ylabel("Loss")
+        plt.legend()
         plt.show()
