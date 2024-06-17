@@ -1,5 +1,4 @@
 import torch
-import matplotlib.pyplot as plt
 from torch import nn
 
 from model import LinearRegressionModel
@@ -62,13 +61,11 @@ if __name__ == '__main__':
         optimizer.step()
 
         #  Testing
-        model_0.eval()  # gradient tracking off, also off the model's functions not needed for testing
+        model_0.eval()  # off the model's settings not needed for testing
+        with torch.inference_mode():  # off gradient tracking
+            test_preds = model_0(X_test)
+            test_loss = loss_fn(test_preds, y_test)
+        if epoch % 10 == 0:
+            print(f"Epoch: {epoch} | Test: {loss} | Test loss: {test_loss}")
 
-        print(model_0.state_dict())
-
-    # Make predictions with trained model
-    with torch.inference_mode():
-        y_preds = model_0(X_test)
-
-    print(y_preds, y_test)
-    Plotter.plot_predictions(X_train, y_train, X_test, y_test, predictions=y_preds)
+    Plotter.plot_predictions(X_train, y_train, X_test, y_test, predictions=test_preds)
