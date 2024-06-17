@@ -32,7 +32,6 @@ if __name__ == '__main__':
     model_0 = LinearRegressionModel()
     print(model_0.state_dict())  # model parameters
 
-
     # Loss function - mean absolute error
     loss_fn = nn.L1Loss()
 
@@ -40,37 +39,30 @@ if __name__ == '__main__':
     optimizer = torch.optim.SGD(params=model_0.parameters(),
                                 lr=0.01)  # learning rate == step size - how big are optimizer parameters changes
 
-    # Training loop.
-    # 0. Loop thought the data.
-    # 1. Forward pass or forward propagation (data moving through the model's `forward` functions)
-    # 2. Calculate the loss (compare forward pass predictions to truth labels)
-    # 3. Optimizer zero grad
-    # 4. Loss backwards propagation - move backwards through the network to calculate the gradients of each parameter
-    # with respect to the loss
-    # 5. Optimizer step - adjust parameters to reduce loss - gradient descent
-
     # Training
     epochs = 150  # An epoch is one single loop through the data
-    for epoch in range(epochs):  # 0. Loop through the data
+    # 0. Loop through the data
+    for epoch in range(epochs):
         model_0.train()  # gradient tracking on
 
-        # 1. Forward pass
+        # 1. Forward pass or forward propagation (data moving through the model's `forward` functions)
         y_pred = model_0(X_train)
-        #  0. Loop through the data
-        # 2. Calculate loss
+
+        # 2. Calculate the loss (compare forward pass predictions to ground truth labels)
         loss = loss_fn(y_pred, y_train)
 
-        # 3. Zero optimizer gradients (they accumulate by default )
+        # 3. Zero optimizer gradients (they accumulate by default)
         optimizer.zero_grad()
 
-        # 4. Perform back propagation on the loss with respect to parameters
+        # 4. Backwards propagation on the loss with respect to parameters (calculate the gradients of each parameter
+        # with respect to the loss
         loss.backward()
 
-        # 5. Step the optimizer
+        # 5. Step the optimizer in gradient descent
         optimizer.step()
 
         #  Testing
-        model_0.eval()  # gradient tracking off
+        model_0.eval()  # gradient tracking off, also off the model's functions not needed for testing
 
         print(model_0.state_dict())
 
