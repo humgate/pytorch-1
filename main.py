@@ -3,38 +3,7 @@ import matplotlib.pyplot as plt
 from torch import nn
 
 from model import LinearRegressionModel
-
-
-def print_pytorch_ver():
-    print('torch version: ' + torch.__version__)
-    print(torch.cuda.current_device())
-
-
-def plot_predictions(train_data,
-                     train_labels,
-                     test_data,
-                     test_labels,
-                     predictions=None
-                     ):
-    """
-    Plots training data, test data and compares predictions.
-    """
-    plt.figure(figsize=(10, 7))
-
-    # Plot training data in blue
-    plt.scatter(train_data, train_labels, c="b", s=4, label="Training data")
-
-    # Plot test data in green
-    plt.scatter(test_data, test_labels, c="g", s=4, label="Testing data")
-
-    # Plot predictions if they exists
-    if predictions is not None:
-        plt.scatter(test_data, predictions, c="r")
-
-    # Legend
-    plt.legend(prop={"size": 14})
-    plt.show()
-
+from plotter import Plotter
 
 if __name__ == '__main__':
     # Known parameters
@@ -54,8 +23,7 @@ if __name__ == '__main__':
     train_split = int(0.8 * len(X))
     X_train, y_train = X[:train_split], y[:train_split]
     X_test, y_test = X[train_split:], y[train_split:]
-    # print(len(X_train), len(y_train), len(X_test), len(y_test))  # 40 40 10 10
-    # plot_predictions(X_train, y_train, X_test, y_test, None)
+    print(len(X_train), len(y_train), len(X_test), len(y_test))  # 40 40 10 10
 
     # Manual seed
     torch.manual_seed(42)
@@ -63,6 +31,7 @@ if __name__ == '__main__':
     # Instance of the model
     model_0 = LinearRegressionModel()
     print(model_0.state_dict())  # model parameters
+
 
     # Loss function - mean absolute error
     loss_fn = nn.L1Loss()
@@ -81,7 +50,7 @@ if __name__ == '__main__':
     # 5. Optimizer step - adjust parameters to reduce loss - gradient descent
 
     # Training
-    epochs = 300  # An epoch is one single loop through the data
+    epochs = 150  # An epoch is one single loop through the data
     for epoch in range(epochs):  # 0. Loop through the data
         model_0.train()  # gradient tracking on
 
@@ -105,9 +74,9 @@ if __name__ == '__main__':
 
         print(model_0.state_dict())
 
-    # Make predictions with model
+    # Make predictions with trained model
     with torch.inference_mode():
-       y_preds = model_0(X_test)
+        y_preds = model_0(X_test)
 
     print(y_preds, y_test)
-    plot_predictions(X_train, y_train, X_test, y_test, predictions=y_preds)
+    Plotter.plot_predictions(X_train, y_train, X_test, y_test, predictions=y_preds)
