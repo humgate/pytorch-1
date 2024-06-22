@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import torch
 from torch import nn
 from model import CircleModel0, CircleModel1, CircleModel2
-from plotter import Plotter
+from util.plotter import Plotter
 
 if __name__ == '__main__':
     device = "cuda" if torch.cuda.is_available() else "cpu"

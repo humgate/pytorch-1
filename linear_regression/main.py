@@ -3,7 +3,7 @@ import torch
 from torch import nn
 
 from model import LinearRegressionModel
-from plotter import Plotter
+from util.plotter import Plotter
 
 if __name__ == '__main__':
     # Known parameters

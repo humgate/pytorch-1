@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 
-from helper_functions import plot_decision_boundary
+from util.helper_functions import plot_decision_boundary
 
 
 class Plotter:
