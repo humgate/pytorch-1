@@ -45,7 +45,7 @@ if __name__ == '__main__':
     test_loss_values = []
 
     # Training
-    epochs = 200  # An epoch is one single loop through the data
+    epochs = 200  # An epoch is one single loop through all the data
     # 0. Loop through the data
     for epoch in range(epochs):
         model_0.train()  # gradient tracking on
