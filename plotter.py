@@ -1,5 +1,7 @@
 from matplotlib import pyplot as plt
 
+from helper_functions import plot_decision_boundary
+
 
 class Plotter:
     @staticmethod
@@ -33,10 +35,28 @@ class Plotter:
                          loss_values,
                          test_loss_values
                          ):
-        plt.plot(epoch_count, loss_values, label ="Train loss")
+        plt.plot(epoch_count, loss_values, label="Train loss")
         plt.plot(epoch_count, test_loss_values, label="Test loss")
         plt.title("Training and test loss curves ")
         plt.xlabel("Epochs")
         plt.ylabel("Loss")
         plt.legend()
+        plt.show()
+
+    @staticmethod
+    def plot_decision_boundary(model,
+                               train_features,
+                               train_labels,
+                               test_features,
+                               test_labels):
+        plt.figure(figsize=(12, 6))
+        plt.subplot(1, 2, 1)
+        plt.title("Train")
+        plot_decision_boundary(model, train_features, train_labels)
+
+        plt.figure(figsize=(12, 6))
+        plt.subplot(1, 2, 2)
+        plt.title("Test")
+        plot_decision_boundary(model, test_features, test_labels)
+
         plt.show()

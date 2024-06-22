@@ -19,7 +19,9 @@ class LinearRegressionModel(nn.Module):  # nn.Module  - base class for any neura
         self.bias = nn.Parameter(torch.randn(1,
                                             requires_grad=True,  # will be updated in through descend
                                             dtype=torch.float))
+        #  self.linear_layer = nn.Linear(in_features=1, out_features=1)  # the same as above using PyTorch nn.Linear
 
     # Forward method defines the computation in the model
     def forward(self, x: torch.Tensor) -> torch.Tensor:  # x is input, returns torch.Tensor
         return self.weights * x + self.bias  # we know that relationship is linear, we do not know weight and bias
+        #  return self.linear_layer(x)  # the same as above using PyTorch nn.Linear
