@@ -4,10 +4,10 @@ from torch import nn
 import torchvision
 from torchvision import datasets
 from torch.utils.data import DataLoader
-from util.plotter import Plotter
-from model import FashionMNISTModel0
+from model import FashionMNISTModel0, FashionMNISTModel1
 from util.timer import Timer
 from tqdm import tqdm
+from util.model_functions import eval_model, train_on_batches, test_on_batches
 
 if __name__ == '__main__':
     # device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -84,43 +84,62 @@ if __name__ == '__main__':
     # )
     loss_fn = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(params=model_0.parameters(), lr=0.1)
-    accuracy_fn = torchmetrics.Accuracy("multiclass", num_classes=10).to(device)
-
+    accuracy_fn = torchmetrics.Accuracy("multiclass", num_classes=10)
+    timer = Timer()
     # 4. Train model_0 on batches
-    torch.manual_seed(42)
-    timer_1 = Timer()
-    timer_1.start_timer()
+    # torch.manual_seed(42)
+    # timer.start_timer()
+    #
+    # epochs = 3
+    # for epoch in tqdm(range(epochs)):
+    #     print(f"Epoch: {epoch}")
+    #     train_loss = 0
+    #
+    #     # train
+    #     for batch, batch_data in enumerate(train_dataloader):
+    #         (X, y) = batch_data  # the same as X = batch_data[0] y = batch_data[1]
+    #         model_0.train()
+    #         y_pred = model_0(X)  # Forward pass
+    #         loss = loss_fn(y_pred, y)  # Calc loss per batch
+    #         train_loss += loss  # accumulate loss with loss from previous batches
+    #         optimizer.zero_grad()
+    #         loss.backward()
+    #         optimizer.step()  # updating model parameters once per batch
+    #         if batch % 100 == 0:
+    #             print(f"Batch {batch} - Looked at  {batch * BATCH_SIZE}/{len(train_data)} samples")
+    #     train_loss /= len(train_dataloader)  # average loss value across all batches in dataloader
+    #
+    #     # test
+    #     test_loss, test_acc = 0, 0
+    #     model_0.eval()
+    #     with torch.inference_mode():
+    #         for X_test, y_test in test_dataloader:
+    #             test_pred = model_0(X_test)
+    #             test_loss += loss_fn(test_pred, y_test)
+    #             test_acc += accuracy_fn(test_pred.argmax(dim=1), y_test)
+    #         test_loss /= len(test_dataloader)
+    #         test_acc /= len(test_dataloader)
+    #     print(f"\nTrain loss: {train_loss:.4f} | Test loss: {test_loss:.4f} |  Test acc: {test_acc:.4f}")
+    # timer.stop_timer()
+    # timer.print_elapsed_time()
 
+    # 4. Make predictions with model_0
+    # print(eval_model(model=model_0, data_loader=test_dataloader, loss_fn=loss_fn, accuracy_fn=accuracy_fn))
+
+    # 5. Instantiate model1, loss function, optimizer, evaluation metric
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model_1 = FashionMNISTModel1(input_shape=784, hidden_units=10, output_shape=len(train_data.classes)).to(device)
+    print(model_1)
+    loss_fn = nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(params=model_1.parameters(), lr=0.1)
+    accuracy_fn = torchmetrics.Accuracy("multiclass", num_classes=10)
+
+    # 6. Train model_1 on batches
+    timer.start_timer()
     epochs = 3
     for epoch in tqdm(range(epochs)):
         print(f"Epoch: {epoch}")
-        train_loss = 0
-
-        # train
-        for batch, batch_data in enumerate(train_dataloader):
-            (X, y) = batch_data  # the same as X = batch_data[0] y = batch_data[1]
-            model_0.train()
-            y_pred = model_0(X)  # Forward pass
-            loss = loss_fn(y_pred, y)  # Calc loss per batch
-            train_loss += loss  # accumulate loss with loss from previous batches
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()  # updating model parameters once per batch
-            if batch % 100 == 0:
-                print(f"Batch {batch} - Looked at  {batch * BATCH_SIZE}/{len(train_data)} samples")
-        train_loss /= len(train_dataloader)  # average loss value across all batches in dataloader
-
-        # test
-        test_loss, test_acc = 0, 0
-        model_0.eval()
-        with torch.inference_mode():
-            for X_test, y_test in test_dataloader:
-                test_pred = model_0(X_test)
-                test_loss += loss_fn(test_pred, y_test)
-                test_acc += accuracy_fn(test_pred.argmax(dim=1), y_test)
-            test_loss /= len(test_dataloader)
-            test_acc /= len(test_dataloader)
-        print(f"\nTrain loss: {train_loss:.4f} | Test loss: {test_loss:.4f} |  Test acc: {test_acc:.4f}")
-
-    timer_1.stop_timer()
-    timer_1.print_elapsed_time()
+        train_on_batches(model_1, train_dataloader, loss_fn, optimizer, accuracy_fn, torch.device(device))
+        test_on_batches(model_1, test_dataloader, loss_fn, accuracy_fn, torch.device(device))
+    timer.stop_timer()
+    timer.print_elapsed_time()

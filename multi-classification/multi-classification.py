@@ -8,6 +8,7 @@ from util.helper_functions import accuracy_fn
 from util.plotter import Plotter
 from torchmetrics import Accuracy
 
+
 if __name__ == '__main__':
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"torch device set to {device}")
