@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
-
 from util.helper_functions import plot_decision_boundary
+import torch
 
 
 class Plotter:
@@ -60,3 +60,38 @@ class Plotter:
         plot_decision_boundary(model, test_features, test_labels)
 
         plt.show()
+
+    @staticmethod
+    def show_image(image, label, title):
+        plt.imshow(image, cmap="gray")
+        plt.title(title + " - " + str(label))
+        plt.show()
+
+    @staticmethod
+    def show_random_images(data, count):
+        torch.manual_seed(42)
+        fig = plt.figure(figsize=(16, 8))
+        rows, cols = 4, 4
+        for i in range(1, rows*cols+1):
+            random_idx = torch.randint(0, len(data), size=[1]).item()
+            img, lab = data[random_idx]
+            fig.add_subplot(rows, cols, i)
+            plt.imshow(img.squeeze(), cmap="gray")
+            plt.title(data.classes[lab] + " - " + str(lab))
+            plt.axis(False)
+        plt.show()
+
+    @staticmethod
+    def show_batch_images(data, features_batch, labels_batch):
+        torch.manual_seed(42)
+        rows = len(features_batch) // 8
+        cols = len(features_batch) // rows
+        fig = plt.figure(figsize=(16, 8))
+        for i in range(1, len(features_batch) + 1):
+            img, lab = features_batch[i - 1], labels_batch[i - 1]
+            fig.add_subplot(rows, cols, i)
+            plt.imshow(img.squeeze(), cmap="gray")
+            plt.title(data.classes[lab].title())
+            plt.axis(False)
+        plt.show()
+
