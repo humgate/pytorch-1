@@ -6,6 +6,8 @@ from torch import nn
 from model import BlobMultiClass0
 from util.helper_functions import accuracy_fn
 from util.plotter import Plotter
+import torchmetrics
+from torchmetrics import Accuracy
 
 if __name__ == '__main__':
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -100,4 +102,15 @@ if __name__ == '__main__':
 
     # Visualize decision boundary for model_4 - woo-hoo!
     Plotter.plot_decision_boundary(model_4, X_blob_train, y_blob_train, X_blob_test, y_blob_test)
+
+    # Additional metrics:
+    # Accuracy - out of 100 samples, how many dos our model get right? Good for balanced classes amounts
+    # Precision
+    # Recall
+    # F1 - score
+    # Classification report
+
+    torchmetric_accuracy = Accuracy("multiclass", num_classes=4).to(device)
+    print(torchmetric_accuracy(test_preds, y_blob_test))  # tensor(0.9950, device='cuda:0')
+
 
