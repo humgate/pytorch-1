@@ -46,7 +46,7 @@ if __name__ == '__main__':
     # Optimizer
     optimizer = torch.optim.SGD(params=model_0.parameters(), lr=0.1)
 
-    # Accuracy = true positive / true positive + true negative
+    # Accuracy = true positive / (true positive + true negative)
     def accuracy_fn(y_true, y_pred):
         correct = torch.eq(y_true, y_pred).sum().item()
         accuracy = (correct / len(y_pred)) * 100

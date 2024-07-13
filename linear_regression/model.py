@@ -1,4 +1,4 @@
-# What the model does:
+ # What the model does:
 # Starts with random values for weight and bias
 # Looks at training data and adjusts the random values to better represent (get closer to) the ideal values
 # (weight and bias) we used to create the data.

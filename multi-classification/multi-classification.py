@@ -6,7 +6,6 @@ from torch import nn
 from model import BlobMultiClass0
 from util.helper_functions import accuracy_fn
 from util.plotter import Plotter
-import torchmetrics
 from torchmetrics import Accuracy
 
 if __name__ == '__main__':
