@@ -4,12 +4,13 @@ from torch import nn
 import torchvision
 from torchvision import datasets
 from torch.utils.data import DataLoader
-from model import FashionMNISTModel0, FashionMNISTModel1
+from .model import FashionMNISTModel0, FashionMNISTModel1
 from util.timer import Timer
 from tqdm import tqdm
 from util.model_functions import eval_model, train_on_batches, test_on_batches
 
-if __name__ == '__main__':
+
+def multi_class_classification_cnn():
     # device = "cuda" if torch.cuda.is_available() else "cpu"
     device = "cpu"
     print(f"torch device set to {device}, "
@@ -130,6 +131,15 @@ if __name__ == '__main__':
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model_1 = FashionMNISTModel1(input_shape=784, hidden_units=10, output_shape=len(train_data.classes)).to(device)
     print(model_1)
+    # FashionMNISTModel1(
+    #   (linear_layer_stack): Sequential(
+    #     (0): Flatten(start_dim=1, end_dim=-1)
+    #     (1): Linear(in_features=784, out_features=10, bias=True)
+    #     (2): ReLU()
+    #     (3): Linear(in_features=10, out_features=10, bias=True)
+    #     (4): ReLU()
+    #   )
+    # )
     loss_fn = nn.CrossEntropyLoss().to(device)
     optimizer = torch.optim.SGD(params=model_1.parameters(), lr=0.1)
     accuracy_fn = torchmetrics.Accuracy("multiclass", num_classes=10).to(device)

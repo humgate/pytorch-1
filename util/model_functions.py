@@ -42,7 +42,7 @@ def train_on_batches(model: Module,
         optimizer.step()  # updating model parameters once per batch
 
     train_loss /= len(data_loader)  # average loss value across all batches in dataloader
-    train_acc /= len(data_loader)  # average loss value across all batches in dataloader
+    train_acc /= len(data_loader)  # average accuracy value across all batches in dataloader
     print(f"\nTrain loss: {train_loss:.4f} | Train acc: {train_acc:.4f}")
 
 

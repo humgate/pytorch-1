@@ -4,10 +4,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import torch
 from torch import nn
-from model import CircleModel0, CircleModel1, CircleModel2
+from .model import CircleModel0, CircleModel1, CircleModel2
 from util.plotter import Plotter
 
-if __name__ == '__main__':
+
+def binary_classification():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"torch device set to {device}")
 

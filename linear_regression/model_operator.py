@@ -1,11 +1,11 @@
 import numpy as np
 import torch
 from torch import nn
-
-from model import LinearRegressionModel
+from .model import LinearRegressionModel
 from util.plotter import Plotter
 
-if __name__ == '__main__':
+
+def linear_regression():
     # Known parameters
     weight = 0.7
     bias = 0.3

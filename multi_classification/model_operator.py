@@ -3,13 +3,13 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import torch
 from torch import nn
-from model import BlobMultiClass0
+from .model import BlobMultiClass0
 from util.helper_functions import accuracy_fn
 from util.plotter import Plotter
 from torchmetrics import Accuracy
 
 
-if __name__ == '__main__':
+def multi_classification():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"torch device set to {device}")
 
