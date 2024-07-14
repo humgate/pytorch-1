@@ -32,9 +32,8 @@ def train_on_batches(model: Module,
     train_loss, train_acc = 0, 0
     model.train()
     for X, y in data_loader:
-        X.to(device), y.to(device)
-
-        y_pred = model(X)  # Forward pass
+        X, y = X.to(device), y.to(device)
+        y_pred = model.forward(X)  # Forward pass
         train_loss = loss_fn(y_pred, y)  # Calc loss per batch
         train_loss += train_loss  # accumulate loss with loss from previous batches
         train_acc += accuracy_fn(torch.argmax(y_pred, dim=-1), y)
@@ -57,12 +56,12 @@ def test_on_batches(model: Module,
     model.eval()
     with torch.inference_mode():
         for X, y in data_loader:
-            X.to(device), y.to(device)
+            X, y = X.to(device), y.to(device)
 
             test_pred = model.forward(X)
             test_loss += loss_fn(test_pred, y)
-            test_acc += accuracy_fn(torch.argmax(torch.argmax(test_pred), dim=-1), y)
+            test_acc += accuracy_fn(torch.argmax(test_pred, dim=-1), y)
 
         test_loss /= len(data_loader)
         test_acc /= len(data_loader)
-        print(f"\nTest loss: {test_loss:.4f} | Train acc: {test_acc:.4f}")
+        print(f"\nTest loss: {test_loss:.4f} | Test acc: {test_acc:.4f}")
