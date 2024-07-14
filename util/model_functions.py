@@ -12,9 +12,6 @@ def eval_model(model: Module,
                device: torch.device):
     torch.manual_seed(42)
     loss, acc = 0, 0
-    loss_fn.to(device)
-    accuracy_fn.to(device)
-    model.to(device)
     model.eval()
     with torch.inference_mode():
         for X, y in tqdm(data_loader):
@@ -62,11 +59,9 @@ def test_on_batches(model: Module,
     with torch.inference_mode():
         for X, y in data_loader:
             X, y = X.to(device), y.to(device)
-
             test_pred = model.forward(X)
             test_loss += loss_fn(test_pred, y)
             test_acc += accuracy_fn(torch.argmax(test_pred, dim=-1), y)
-
         test_loss /= len(data_loader)
         test_acc /= len(data_loader)
-        print(f"\nTest loss: {test_loss:.4f} | Test acc: {test_acc:.4f}")
+    print(f"\nTest loss: {test_loss:.4f} | Test acc: {test_acc:.4f}")

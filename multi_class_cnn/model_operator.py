@@ -4,13 +4,15 @@ from torch import nn
 import torchvision
 from torchvision import datasets
 from torch.utils.data import DataLoader
+
+from util.plotter import Plotter
 from .model import *
 from util.timer import Timer
 from tqdm import tqdm
 from util.model_functions import eval_model, train_on_batches, test_on_batches
 
 
-def multi_class_classification_cnn():
+def multi_class_classification_non_cnn():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"torch device set to {device}, "
           f"torch version {torch.__version__}, "
@@ -61,17 +63,18 @@ def multi_class_classification_cnn():
                                  batch_size=BATCH_SIZE,
                                  shuffle=False)
     print(f"train DataLoader: {len(train_dataloader)} batches of {BATCH_SIZE} each")  # 1875 batches of 32 each
-    print(f"train DataLoader: {len(test_dataloader)} batches of {BATCH_SIZE} each")  # 313 batches of 32 each
+    print(f"test DataLoader: {len(test_dataloader)} batches of {BATCH_SIZE} each")  # 313 batches of 32 each
 
     train_features_batch, train_labels_batch = next(iter(train_dataloader))
     print(f"train_features_batch.shape= {train_features_batch.shape}")  # torch.Size([32, 1, 28, 28])
     print(f"train_labels_batch.shape= {train_labels_batch.shape}")  # torch.Size([32])
     print(len(train_features_batch))  # 32
-    # Plotter.show_batch_images(train_data,
-    #                           train_features_batch,
-    #                           train_labels_batch,
-    #                           )
-
+    '''
+    Plotter.show_batch_images(train_data,
+                              train_features_batch,
+                              train_labels_batch,
+                              )
+    '''
     # 3. Instantiate model0, loss function, optimizer, evaluation metric
     model_0 = FashionMNISTModel0(input_shape=784, hidden_units=10, output_shape=len(train_data.classes)).to(device)
     print(model_0)
@@ -89,19 +92,18 @@ def multi_class_classification_cnn():
     accuracy_fn = torchmetrics.Accuracy("multiclass", num_classes=10).to(device)
     timer = Timer()
     # 4. Train model_0 on batches
-    '''
     torch.manual_seed(42)
     timer.start_timer()
 
     epochs = 3
     for epoch in tqdm(range(epochs)):
         print(f"Epoch: {epoch}")
-        train_loss = 0
-
         # train
+        train_loss = 0
+        model_0.train()
         for batch, batch_data in enumerate(train_dataloader):
             (X, y) = batch_data  # the same as X = batch_data[0] y = batch_data[1]
-            model_0.train()
+            X, y = X.to(device), y.to(device)
             y_pred = model_0(X)  # Forward pass
             loss = loss_fn(y_pred, y)  # Calc loss per batch
             train_loss += loss  # accumulate loss with loss from previous batches
@@ -117,6 +119,7 @@ def multi_class_classification_cnn():
         model_0.eval()
         with torch.inference_mode():
             for X_test, y_test in test_dataloader:
+                X_test, y_test = X_test.to(device), y_test.to(device)
                 test_pred = model_0(X_test)
                 test_loss += loss_fn(test_pred, y_test)
                 test_acc += accuracy_fn(test_pred.argmax(dim=1), y_test)
@@ -125,7 +128,6 @@ def multi_class_classification_cnn():
         print(f"\nTrain loss: {train_loss:.4f} | Test loss: {test_loss:.4f} |  Test acc: {test_acc:.4f}")
     timer.stop_timer()
     timer.print_elapsed_time()
-    '''
 
     # 4. Instantiate model1, loss function, optimizer, evaluation metric
     model_1 = FashionMNISTModel1(input_shape=784, hidden_units=10, output_shape=len(train_data.classes)).to(device)
@@ -146,7 +148,6 @@ def multi_class_classification_cnn():
     accuracy_fn = torchmetrics.Accuracy("multiclass", num_classes=10).to(device)
 
     # 5. Train model_1 on batches
-    '''
     timer.start_timer()
     epochs = 3
     for epoch in tqdm(range(epochs)):
@@ -159,44 +160,3 @@ def multi_class_classification_cnn():
     # 6. Compare models
     print(eval_model(model_0, test_dataloader, loss_fn, accuracy_fn, torch.device(device)))
     print(eval_model(model_1, test_dataloader, loss_fn, accuracy_fn, torch.device(device)))
-    '''
-    # 3. Instantiate model2, loss function, optimizer, evaluation metric
-    model_2 = FashionMNISTCNNModel0(input_shape=1,  hidden_units=10, output_shape=len(train_data.classes)).to(device)
-    print(model_2)
-    '''
-    FashionMNISTCNNModel0(
-      (conf_block_1): Sequential(
-        (0): Conv2d(1, 10, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
-        (1): ReLU()
-        (2): Conv2d(10, 10, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
-        (3): ReLU()
-        (4): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
-      )
-      (conf_block_2): Sequential(
-        (0): Conv2d(10, 10, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
-        (1): ReLU()
-        (2): Conv2d(10, 10, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
-        (3): ReLU()
-        (4): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
-      )
-      (output_block): Sequential(
-        (0): Flatten(start_dim=1, end_dim=-1)
-        (1): Linear(in_features=10, out_features=10, bias=True)
-      )
-    )
-    '''
-    # Convolution layer creates 10 (out_channels) images of the same or a bit smaller (depending on stride & padding)
-    # size where each image focuses on its own feature from original image
-    image = torch.randn(size=(32, 3, 64, 64))[0]
-    print(image.shape)  # torch.Size([3, 64, 64])
-
-    conv_layer = nn.Conv2d(in_channels=3, out_channels=10, kernel_size=(3, 3), stride=1, padding=0)
-    image_after_conv_layer = conv_layer.forward(image)
-    print(image_after_conv_layer.shape)  # torch.Size([10, 62, 62])
-
-    # MaxPool creates compressed image 4 (kernel_size) times smaller than input image
-    # where each pixel is max from each 4 X 4 region (non overlapping with other regions) of input image
-    max_pool_layer = nn.MaxPool2d(kernel_size=4)
-    image_after_max_pool_layer = max_pool_layer(image_after_conv_layer)
-    print(image_after_max_pool_layer.shape)  # torch.Size([10, 15, 15])
-
