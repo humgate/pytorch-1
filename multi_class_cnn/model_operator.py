@@ -4,15 +4,14 @@ from torch import nn
 import torchvision
 from torchvision import datasets
 from torch.utils.data import DataLoader
-from .model import FashionMNISTModel0, FashionMNISTModel1
+from .model import *
 from util.timer import Timer
 from tqdm import tqdm
 from util.model_functions import eval_model, train_on_batches, test_on_batches
 
 
 def multi_class_classification_cnn():
-    # device = "cuda" if torch.cuda.is_available() else "cpu"
-    device = "cpu"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"torch device set to {device}, "
           f"torch version {torch.__version__}, "
           f"torchvision version {torchvision.__version__}")
@@ -76,18 +75,21 @@ def multi_class_classification_cnn():
     # 3. Instantiate model0, loss function, optimizer, evaluation metric
     model_0 = FashionMNISTModel0(input_shape=784, hidden_units=10, output_shape=len(train_data.classes)).to(device)
     print(model_0)
-    # FashionMNISTModel0(
-    #   (linear_layer_stack): Sequential(
-    #     (0): Flatten(start_dim=1, end_dim=-1)
-    #     (1): Linear(in_features=784, out_features=10, bias=True)
-    #     (2): Linear(in_features=10, out_features=10, bias=True)
-    #   )
-    # )
+    '''
+    FashionMNISTModel0(
+       (linear_layer_stack): Sequential(
+         (0): Flatten(start_dim=1, end_dim=-1)
+         (1): Linear(in_features=784, out_features=10, bias=True)
+         (2): Linear(in_features=10, out_features=10, bias=True)
+       )
+    )
+    '''
     loss_fn = nn.CrossEntropyLoss().to(device)
     optimizer = torch.optim.SGD(params=model_0.parameters(), lr=0.1)
     accuracy_fn = torchmetrics.Accuracy("multiclass", num_classes=10).to(device)
     timer = Timer()
     # 4. Train model_0 on batches
+    '''
     torch.manual_seed(42)
     timer.start_timer()
 
@@ -106,7 +108,7 @@ def multi_class_classification_cnn():
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()  # updating model parameters once per batch
-            if batch % 100 == 0:
+            if batch % 500 == 0:
                 print(f"Batch {batch} - Looked at  {batch * BATCH_SIZE}/{len(train_data)} samples")
         train_loss /= len(train_dataloader)  # average loss value across all batches in dataloader
 
@@ -123,28 +125,28 @@ def multi_class_classification_cnn():
         print(f"\nTrain loss: {train_loss:.4f} | Test loss: {test_loss:.4f} |  Test acc: {test_acc:.4f}")
     timer.stop_timer()
     timer.print_elapsed_time()
+    '''
 
-    # 4. Make predictions with model_0
-    # print(eval_model(model=model_0, data_loader=test_dataloader, loss_fn=loss_fn, accuracy_fn=accuracy_fn))
-
-    # 5. Instantiate model1, loss function, optimizer, evaluation metric
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    # 4. Instantiate model1, loss function, optimizer, evaluation metric
     model_1 = FashionMNISTModel1(input_shape=784, hidden_units=10, output_shape=len(train_data.classes)).to(device)
     print(model_1)
-    # FashionMNISTModel1(
-    #   (linear_layer_stack): Sequential(
-    #     (0): Flatten(start_dim=1, end_dim=-1)
-    #     (1): Linear(in_features=784, out_features=10, bias=True)
-    #     (2): ReLU()
-    #     (3): Linear(in_features=10, out_features=10, bias=True)
-    #     (4): ReLU()
-    #   )
-    # )
+    '''
+    FashionMNISTModel1(
+       (linear_layer_stack): Sequential(
+          (0): Flatten(start_dim=1, end_dim=-1)
+          (1): Linear(in_features=784, out_features=10, bias=True)
+          (2): ReLU()
+          (3): Linear(in_features=10, out_features=10, bias=True)
+          (4): ReLU()
+      )
+    )
+    '''
     loss_fn = nn.CrossEntropyLoss().to(device)
     optimizer = torch.optim.SGD(params=model_1.parameters(), lr=0.1)
     accuracy_fn = torchmetrics.Accuracy("multiclass", num_classes=10).to(device)
 
-    # 6. Train model_1 on batches
+    # 5. Train model_1 on batches
+    '''
     timer.start_timer()
     epochs = 3
     for epoch in tqdm(range(epochs)):
@@ -153,3 +155,48 @@ def multi_class_classification_cnn():
         test_on_batches(model_1, test_dataloader, loss_fn, accuracy_fn, torch.device(device))
     timer.stop_timer()
     timer.print_elapsed_time()
+
+    # 6. Compare models
+    print(eval_model(model_0, test_dataloader, loss_fn, accuracy_fn, torch.device(device)))
+    print(eval_model(model_1, test_dataloader, loss_fn, accuracy_fn, torch.device(device)))
+    '''
+    # 3. Instantiate model2, loss function, optimizer, evaluation metric
+    model_2 = FashionMNISTCNNModel0(input_shape=1,  hidden_units=10, output_shape=len(train_data.classes)).to(device)
+    print(model_2)
+    '''
+    FashionMNISTCNNModel0(
+      (conf_block_1): Sequential(
+        (0): Conv2d(1, 10, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): ReLU()
+        (2): Conv2d(10, 10, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): ReLU()
+        (4): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+      )
+      (conf_block_2): Sequential(
+        (0): Conv2d(10, 10, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): ReLU()
+        (2): Conv2d(10, 10, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): ReLU()
+        (4): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+      )
+      (output_block): Sequential(
+        (0): Flatten(start_dim=1, end_dim=-1)
+        (1): Linear(in_features=10, out_features=10, bias=True)
+      )
+    )
+    '''
+    # Convolution layer creates 10 (out_channels) images of the same or a bit smaller (depending on stride & padding)
+    # size where each image focuses on its own feature from original image
+    image = torch.randn(size=(32, 3, 64, 64))[0]
+    print(image.shape)  # torch.Size([3, 64, 64])
+
+    conv_layer = nn.Conv2d(in_channels=3, out_channels=10, kernel_size=(3, 3), stride=1, padding=0)
+    image_after_conv_layer = conv_layer.forward(image)
+    print(image_after_conv_layer.shape)  # torch.Size([10, 62, 62])
+
+    # MaxPool creates compressed image 4 (kernel_size) times smaller than input image
+    # where each pixel is max from each 4 X 4 region (non overlapping with other regions) of input image
+    max_pool_layer = nn.MaxPool2d(kernel_size=4)
+    image_after_max_pool_layer = max_pool_layer(image_after_conv_layer)
+    print(image_after_max_pool_layer.shape)  # torch.Size([10, 15, 15])
+

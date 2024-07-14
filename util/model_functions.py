@@ -8,12 +8,17 @@ from tqdm import tqdm
 def eval_model(model: Module,
                data_loader: DataLoader,
                loss_fn: Module,
-               accuracy_fn: torchmetrics.Metric):
+               accuracy_fn: torchmetrics.Metric,
+               device: torch.device):
     torch.manual_seed(42)
     loss, acc = 0, 0
+    loss_fn.to(device)
+    accuracy_fn.to(device)
+    model.to(device)
     model.eval()
     with torch.inference_mode():
         for X, y in tqdm(data_loader):
+            X, y = X.to(device), y.to(device)
             y_pred = model.forward(X)
             loss += loss_fn(y_pred, y)
             acc += accuracy_fn(torch.argmax(y_pred, dim=-1), y)
