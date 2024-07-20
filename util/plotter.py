@@ -1,3 +1,9 @@
+import random
+from pathlib import Path
+
+import numpy as np
+from PIL import Image
+
 from matplotlib import pyplot as plt
 from util.helper_functions import plot_decision_boundary
 import torch
@@ -68,7 +74,7 @@ class Plotter:
     @staticmethod
     def show_image(image, label, title):
         plt.imshow(image, cmap="gray")
-        plt.title(title + " - " + str(label))
+        plt.title(label=title + " - " + str(label), fontsize=10)
         plt.show()
 
     @staticmethod
@@ -116,3 +122,17 @@ class Plotter:
                               class_names=data.classes,
                               figsize=(10, 7))
         plt.show()
+
+    @staticmethod
+    def show_random_image(image_path: Path):
+        random.seed(42)
+        image_path_list = list(image_path.glob("*/*/*.jpg"))
+        random_image_path = random.choice(image_path_list)
+        image_class = random_image_path.parent.stem
+        image = Image.open(random_image_path)
+        img_as_array = np.array(image)
+        Plotter.show_image(image,
+                           image_class,
+                           str(random_image_path) + "\n"
+                           + "width:" + str(image.width) + " height:" + str(image.height) + "\n"
+                           + " Image shape:" + str(img_as_array.shape))
