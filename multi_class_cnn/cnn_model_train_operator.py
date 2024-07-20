@@ -1,17 +1,14 @@
-import torch
-import torchmetrics
-from torch import nn
+import random
+
 import torchvision
 from torchvision import datasets
-from torch.utils.data import DataLoader
 
-from .model import *
+from util.model_functions import *
 from util.timer import Timer
-from tqdm import tqdm
-from util.model_functions import eval_model, train_on_batches, test_on_batches
+from .model import *
 
 
-def multi_class_classification_cnn():
+def multi_class_train_cnn():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"torch device set to {device}, "
           f"torch version {torch.__version__}, "
@@ -46,6 +43,7 @@ def multi_class_classification_cnn():
 
     # 3. Instantiate CNN model2
     model_2 = FashionMNISTCNNModel0(input_shape=1, hidden_units=10, output_shape=len(train_data.classes)).to(device)
+    save_model(model_2, "cnn_fashion_mnist.pth")
     print(model_2)
     '''
     FashionMNISTCNNModel0(
@@ -109,6 +107,7 @@ def multi_class_classification_cnn():
         test_on_batches(model_2, test_dataloader, loss_fn, accuracy_fn, torch.device(device))
     timer.stop_timer()
     timer.print_elapsed_time()
+    save_model(model_2, "cnn_fashion_mnist.pth")
 
     # 7. Get cnn model test results
     print(eval_model(model_2, test_dataloader, loss_fn, accuracy_fn, torch.device(device)))

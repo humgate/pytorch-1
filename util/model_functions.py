@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import torchmetrics
 import torch
 from torch.utils.data import DataLoader
@@ -65,3 +67,35 @@ def test_on_batches(model: Module,
         test_loss /= len(data_loader)
         test_acc /= len(data_loader)
     print(f"\nTest loss: {test_loss:.4f} | Test acc: {test_acc:.4f}")
+
+
+def save_model(model: Module,
+               model_name: str):
+    model_path = Path("models")
+    model_path.mkdir(parents=True, exist_ok=True)
+    print(f"Saving model to: {model_path}")
+    torch.save(obj=model.state_dict(),  # saving the state_dict() only saves the models learned parameters
+               f=model_path / model_name)
+
+
+def load_model(model: Module,
+               model_name: str):
+    model_path = Path("models")
+    print(f"Loading model from: {model_path}/{model_name}")
+    model.load_state_dict(torch.load(f=model_path / model_name))
+
+
+def make_predictions(model: torch.nn.Module,
+                     data: list,
+                     device: torch.device):
+    pred_labels = []
+    model.to(device)
+    model.eval()
+    with torch.inference_mode():
+        for image in data:
+            image = torch.unsqueeze(image, dim=0).to(device)  # add batch dimension
+            pred_logit = model.forward(image)  # output is raw logit
+            pred_prob = torch.softmax(pred_logit.squeeze(), dim=0)  # logit -> prediction probability
+            pred_label = pred_prob.argmax()
+            pred_labels.append(pred_label.cpu())  # get pred_prob to cpu
+    return torch.stack(pred_labels)

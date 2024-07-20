@@ -72,7 +72,7 @@ class Plotter:
         torch.manual_seed(42)
         fig = plt.figure(figsize=(16, 8))
         rows, cols = 4, 4
-        for i in range(1, rows*cols+1):
+        for i in range(1, rows * cols + 1):
             random_idx = torch.randint(0, len(data), size=[1]).item()
             img, lab = data[random_idx]
             fig.add_subplot(rows, cols, i)
@@ -82,16 +82,23 @@ class Plotter:
         plt.show()
 
     @staticmethod
-    def show_batch_images(data, features_batch, labels_batch):
+    def show_batch_images(data, features_batch, labels_batch, preds_batch=None):
         torch.manual_seed(42)
         rows = len(features_batch) // 8
         cols = len(features_batch) // rows
-        fig = plt.figure(figsize=(16, 8))
+        fig = plt.figure(num="Class name - truth number - pred number", figsize=(16, 8))
+        fig.text(10, 10, "Class name - truth class - pred class")
         for i in range(1, len(features_batch) + 1):
             img, lab = features_batch[i - 1], labels_batch[i - 1]
             fig.add_subplot(rows, cols, i)
             plt.imshow(img.squeeze(), cmap="gray")
-            plt.title(data.classes[lab].title())
+            color = "black"
+            if preds_batch is not None:
+                color = "green" if preds_batch[i - 1] == lab else "red"
+            plt.title(f"{data.classes[lab].title()} - "
+                      f"{labels_batch[i - 1]}"
+                      f"{' - ' + str(preds_batch[i - 1].item()) if preds_batch is not None else ''}",
+                      fontsize=10,
+                      c=color)
             plt.axis(False)
         plt.show()
-
