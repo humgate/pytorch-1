@@ -1,6 +1,10 @@
 from matplotlib import pyplot as plt
 from util.helper_functions import plot_decision_boundary
 import torch
+import torchmetrics
+from torchmetrics import ConfusionMatrix
+import mlxtend
+from mlxtend.plotting import plot_confusion_matrix
 
 
 class Plotter:
@@ -101,4 +105,14 @@ class Plotter:
                       fontsize=10,
                       c=color)
             plt.axis(False)
+        plt.show()
+
+    @staticmethod
+    def show_confusion_matrix(data, preds_batch):
+        conf_matrix = ConfusionMatrix(task="multiclass", num_classes=len(data.classes))
+        conf_matrix_tensor = conf_matrix(preds=preds_batch, target=data.targets)
+
+        plot_confusion_matrix(conf_mat=conf_matrix_tensor.numpy(),
+                              class_names=data.classes,
+                              figsize=(10, 7))
         plt.show()

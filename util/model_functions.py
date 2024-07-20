@@ -92,10 +92,13 @@ def make_predictions(model: torch.nn.Module,
     model.to(device)
     model.eval()
     with torch.inference_mode():
-        for image in data:
-            image = torch.unsqueeze(image, dim=0).to(device)  # add batch dimension
+        for image in tqdm(data, desc="Making predictions..."):
+            # add batch dimension because our model Flatten layer flattens tensor starting at 1st dimension
+            # so if we do not add 0th dimension, flattened matrix will have wrong size to be multiplied to output
+            image = torch.unsqueeze(image, dim=0).to(device)
             pred_logit = model.forward(image)  # output is raw logit
-            pred_prob = torch.softmax(pred_logit.squeeze(), dim=0)  # logit -> prediction probability
-            pred_label = pred_prob.argmax()
+            # pred_prob = torch.softmax(pred_logit.squeeze(), dim=0)  # logit -> prediction probability
+            # pred_label = pred_prob.argmax()
+            pred_label = pred_logit.argmax()  # argmax the logit directly if we do not need the probability itself
             pred_labels.append(pred_label.cpu())  # get pred_prob to cpu
     return torch.stack(pred_labels)
