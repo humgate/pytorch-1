@@ -32,18 +32,21 @@ def multi_class_train_cnn():
     print(f"train data length: {len(train_data)}, test data length: {len(test_data)}")  # train: 60000, test: 10000
 
     # 2. Prepare DataLoader
-    BATCH_SIZE = 32
+    batch_size = 32
     train_dataloader = DataLoader(dataset=train_data,
-                                  batch_size=BATCH_SIZE,
+                                  batch_size=batch_size,
                                   shuffle=True)  # remove images order
 
     test_dataloader = DataLoader(dataset=test_data,
-                                 batch_size=BATCH_SIZE,
+                                 batch_size=batch_size,
                                  shuffle=False)
 
     # 3. Instantiate CNN model2
-    model_2 = CNNModel0(input_shape=1, hidden_units=10, output_shape=len(train_data.classes)).to(device)
-    save_model(model_2, "cnn_fashion_mnist.pth")
+    model_2 = CNNModel0(input_shape=1,
+                        hidden_units=10,
+                        output_shape=len(train_data.classes),
+                        last_linear_in_features_multiplier=49).to(device)
+
     print(model_2)
     '''
     FashionMNISTCNNModel0(
@@ -103,8 +106,8 @@ def multi_class_train_cnn():
     epochs = 3
     for epoch in tqdm(range(epochs)):
         print(f"Epoch: {epoch}")
-        train_on_batches(model_2, train_dataloader, loss_fn, optimizer, accuracy_fn, torch.device(device))
-        test_on_batches(model_2, test_dataloader, loss_fn, accuracy_fn, torch.device(device))
+        train_step_on_batches(model_2, train_dataloader, loss_fn, optimizer, accuracy_fn, torch.device(device))
+        test_step_on_batches(model_2, test_dataloader, loss_fn, accuracy_fn, torch.device(device))
     timer.stop_timer()
     timer.print_elapsed_time()
     save_model(model_2, "cnn_fashion_mnist.pth")

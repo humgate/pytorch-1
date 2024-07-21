@@ -9,3 +9,4 @@ torchmetrics~=1.4.0.post0
 tqdm~=4.66.4
 mlxtend~=0.23.1
 pillow~=10.2.0
+torchinfo~=1.8.0

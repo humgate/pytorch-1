@@ -9,7 +9,7 @@ from util.plotter import Plotter
 from .model import *
 from util.timer import Timer
 from tqdm import tqdm
-from util.model_functions import eval_model, train_on_batches, test_on_batches
+from util.model_functions import eval_model, train_step_on_batches, test_step_on_batches
 
 
 def multi_class_classification_non_cnn():
@@ -152,8 +152,8 @@ def multi_class_classification_non_cnn():
     epochs = 3
     for epoch in tqdm(range(epochs)):
         print(f"Epoch: {epoch}")
-        train_on_batches(model_1, train_dataloader, loss_fn, optimizer, accuracy_fn, torch.device(device))
-        test_on_batches(model_1, test_dataloader, loss_fn, accuracy_fn, torch.device(device))
+        train_step_on_batches(model_1, train_dataloader, loss_fn, optimizer, accuracy_fn, torch.device(device))
+        test_step_on_batches(model_1, test_dataloader, loss_fn, accuracy_fn, torch.device(device))
     timer.stop_timer()
     timer.print_elapsed_time()
 

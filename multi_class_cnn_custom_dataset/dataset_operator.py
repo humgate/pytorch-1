@@ -4,9 +4,11 @@ import zipfile
 from pathlib import Path
 from typing import Tuple
 
+import torchvision.datasets
 from PIL import Image
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
+from torchvision.datasets import ImageFolder
 
 from util.plotter import Plotter
 from .image_folder_dataset import ImageFolderDataset
@@ -22,7 +24,7 @@ def get_random_image(image_path):
     return image_dict
 
 
-def load_dataset(images_path: str, download_url: str, batch_size=32) -> Tuple[DataLoader, DataLoader]:
+def load_dataset(images_path: str, download_url: str) -> Tuple[ImageFolder, ImageFolder]:
     """
     The data we're going to be using is a subset of the Food101 dataset.
     Subset contains 3 classes of food and 1000 images pres class (750 training 250 testing).
@@ -53,7 +55,7 @@ def load_dataset(images_path: str, download_url: str, batch_size=32) -> Tuple[Da
     data_transform = transforms.Compose([
         transforms.Resize(64),
         transforms.CenterCrop(64),
-        transforms.TrivialAugmentWide(num_magnitude_bins=15),
+        transforms.TrivialAugmentWide(num_magnitude_bins=31),
         transforms.RandomHorizontalFlip(p=0.5),
         transforms.ToTensor()
     ])
@@ -84,18 +86,4 @@ def load_dataset(images_path: str, download_url: str, batch_size=32) -> Tuple[Da
     test_data_custom = ImageFolderDataset(target_dir=test_dir,
                                           transform=data_transform)
     # Plotter.show_image(train_data_custom[0][0].permute(1, 2, 0), train_data.classes[0], str(train_data[0][1]))
-
-    # Turn datasets in Dataloaders
-    train_dataloader = DataLoader(dataset=train_data_custom,
-                                  batch_size=batch_size,
-                                  num_workers=os.cpu_count(),
-                                  shuffle=True)
-    test_dataloader = DataLoader(dataset=test_data,
-                                 batch_size=batch_size,
-                                 num_workers=os.cpu_count(),
-                                 shuffle=True)
-
-    return train_dataloader, test_dataloader
-
-
-
+    return train_data, test_data

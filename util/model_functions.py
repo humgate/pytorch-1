@@ -6,6 +6,8 @@ from torch.utils.data import DataLoader
 from torch.nn import Module
 from tqdm import tqdm
 
+from util.timer import Timer
+
 
 def eval_model(model: Module,
                data_loader: DataLoader,
@@ -16,9 +18,9 @@ def eval_model(model: Module,
     loss, acc = 0, 0
     model.eval()
     with torch.inference_mode():
-        for X, y in tqdm(data_loader):
-            X, y = X.to(device), y.to(device)
-            y_pred = model.forward(X)
+        for x, y in tqdm(data_loader):
+            x, y = x.to(device), y.to(device)
+            y_pred = model.forward(x)
             loss += loss_fn(y_pred, y)
             acc += accuracy_fn(torch.argmax(y_pred, dim=-1), y)
         loss /= len(data_loader)
@@ -26,18 +28,18 @@ def eval_model(model: Module,
     return {"model_name": model.__class__.__name__, "model_loss": loss.item(), "model_acc": acc.item()}
 
 
-def train_on_batches(model: Module,
-                     data_loader: DataLoader,
-                     loss_fn: Module,
-                     optimizer: torch.optim,
-                     accuracy_fn: torchmetrics.Metric,
-                     device: torch.device):
-    torch.manual_seed(42)
+def train_step_on_batches(model: Module,
+                          data_loader: DataLoader,
+                          loss_fn: Module,
+                          optimizer: torch.optim,
+                          accuracy_fn: torchmetrics.Metric,
+                          device: torch.device):
+
     train_loss, train_acc = 0, 0
     model.train()
-    for X, y in data_loader:
-        X, y = X.to(device), y.to(device)
-        y_pred = model.forward(X)  # Forward pass
+    for x, y in data_loader:
+        x, y = x.to(device), y.to(device)
+        y_pred = model.forward(x)  # Forward pass
         train_loss = loss_fn(y_pred, y)  # Calc loss per batch
         train_loss += train_loss  # accumulate loss with loss from previous batches
         train_acc += accuracy_fn(torch.argmax(y_pred, dim=-1), y)
@@ -47,26 +49,61 @@ def train_on_batches(model: Module,
 
     train_loss /= len(data_loader)  # average loss value across all batches in dataloader
     train_acc /= len(data_loader)  # average accuracy value across all batches in dataloader
-    print(f"\nTrain loss: {train_loss:.4f} | Train acc: {train_acc:.4f}")
+
+    return train_loss, train_acc
 
 
-def test_on_batches(model: Module,
-                    data_loader: DataLoader,
-                    loss_fn: Module,
-                    accuracy_fn: torchmetrics.Metric,
-                    device: torch.device):
-    torch.manual_seed(42)
+def test_step_on_batches(model: Module,
+                         data_loader: DataLoader,
+                         loss_fn: Module,
+                         accuracy_fn: torchmetrics.Metric,
+                         device: torch.device):
+
     test_loss, test_acc = 0, 0
     model.eval()
     with torch.inference_mode():
-        for X, y in data_loader:
-            X, y = X.to(device), y.to(device)
-            test_pred = model.forward(X)
+        for x, y in data_loader:
+            x, y = x.to(device), y.to(device)
+            test_pred = model.forward(x)
             test_loss += loss_fn(test_pred, y)
             test_acc += accuracy_fn(torch.argmax(test_pred, dim=-1), y)
         test_loss /= len(data_loader)
         test_acc /= len(data_loader)
-    print(f"\nTest loss: {test_loss:.4f} | Test acc: {test_acc:.4f}")
+
+    return test_loss, test_acc
+
+
+def train(model: Module,
+          train_data_loader: DataLoader,
+          test_data_loader: DataLoader,
+          loss_fn: Module,
+          optimizer: torch.optim,
+          accuracy_fn: torchmetrics.Metric,
+          epochs: int,
+          device: torch.device):
+
+    results = {"train_loss": [], "train_acc": [], "test_loss": [], "test_acc": []}
+    timer = Timer()
+
+    timer.start_timer()
+    for epoch in tqdm(range(epochs)):
+        train_loss, train_acc = (
+            train_step_on_batches(model, train_data_loader, loss_fn, optimizer, accuracy_fn, torch.device(device)))
+        test_loss, test_acc = (
+            test_step_on_batches(model, test_data_loader, loss_fn, accuracy_fn, torch.device(device)))
+        print(f"\nEpoch: {epoch} | Train loss: {train_loss:.4f} | Train acc: {train_acc:.4f}"
+              f" | Test loss: {test_loss:.4f} | Test acc: {test_acc:.4f}")
+
+        results["train_loss"].append(train_loss.item())
+        results["train_acc"].append(train_acc.item())
+        results["test_loss"].append(test_loss.item())
+        results["test_acc"].append(test_acc.item())
+    timer.stop_timer()
+    timer.print_elapsed_time()
+    del model
+    torch.cuda.empty_cache()
+
+    return results
 
 
 def save_model(model: Module,

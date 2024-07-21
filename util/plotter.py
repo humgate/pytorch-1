@@ -1,5 +1,6 @@
 import random
 from pathlib import Path
+from typing import Dict, List
 
 import numpy as np
 from PIL import Image
@@ -141,3 +142,26 @@ class Plotter:
                            str(image_dict['image_path']) + "\n"
                            + "width:" + str(image.width) + " height:" + str(image.height) + "\n"
                            + " Image shape:" + str(img_as_array.shape))
+
+    @staticmethod
+    def plot_loss_accuracy_curves(results: Dict[str, List[float]]):
+        train_loss = results["train_loss"]
+        test_loss = results["test_loss"]
+        train_acc = results["train_acc"]
+        test_acc = results["test_acc"]
+        epochs = range(len(results["train_loss"]))
+
+        plt.subplot(1, 2, 1)
+        plt.plot(epochs, train_loss, label="train_loss")
+        plt.plot(epochs, test_loss, label="test_loss")
+        plt.title("Loss")
+        plt.xlabel("Epochs")
+        plt.legend()
+
+        plt.subplot(1, 2, 2)
+        plt.plot(epochs, train_acc, label="train_accuracy")
+        plt.plot(epochs, test_acc, label="test_accuracy")
+        plt.title("Accuracy")
+        plt.xlabel("Epochs")
+        plt.legend()
+        plt.show()

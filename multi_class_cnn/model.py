@@ -31,7 +31,7 @@ class FashionMNISTModel1(nn.Module):  # non CNN, non-linear by adding ReLU activ
 
 
 class CNNModel0(nn.Module):  # CNN. Replicates TinyVGG from https://poloclub.github.io/cnn-explainer/
-    def __init__(self, input_shape: int, hidden_units: int, output_shape: int):
+    def __init__(self, input_shape: int, hidden_units: int, output_shape: int, last_linear_in_features_multiplier: int):
         super().__init__()
         self.conv_block_1 = nn.Sequential(
             nn.Conv2d(in_channels=input_shape,
@@ -65,7 +65,7 @@ class CNNModel0(nn.Module):  # CNN. Replicates TinyVGG from https://poloclub.git
         )
         self.output_block = nn.Sequential(
             nn.Flatten(),  # x.shape = torch.Size([10, 7, 7]), flatten shape = torch.Size([10, 49])
-            nn.Linear(in_features=hidden_units*49,  # 49!
+            nn.Linear(in_features=hidden_units*last_linear_in_features_multiplier,  # 49!
                       out_features=output_shape)
         )
 
