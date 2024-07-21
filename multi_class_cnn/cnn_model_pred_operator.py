@@ -34,7 +34,7 @@ def multi_class_pred_cnn():
         test_images.append(image)
         test_labels.append(label)
 
-    model_2 = FashionMNISTCNNModel0(input_shape=1, hidden_units=10, output_shape=len(train_data.classes)).to(device)
+    model_2 = CNNModel0(input_shape=1, hidden_units=10, output_shape=len(train_data.classes)).to(device)
     load_model(model_2, model_name)
 
     pred_labels = make_predictions(model=model_2,

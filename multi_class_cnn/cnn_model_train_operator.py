@@ -42,7 +42,7 @@ def multi_class_train_cnn():
                                  shuffle=False)
 
     # 3. Instantiate CNN model2
-    model_2 = FashionMNISTCNNModel0(input_shape=1, hidden_units=10, output_shape=len(train_data.classes)).to(device)
+    model_2 = CNNModel0(input_shape=1, hidden_units=10, output_shape=len(train_data.classes)).to(device)
     save_model(model_2, "cnn_fashion_mnist.pth")
     print(model_2)
     '''

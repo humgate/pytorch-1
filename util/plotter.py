@@ -78,7 +78,16 @@ class Plotter:
         plt.show()
 
     @staticmethod
-    def show_random_images(data, count):
+    def show_image_with_dict(image_dict):
+        plt.imshow(image_dict['image'], cmap="gray")
+        plt.title(label=
+                  image_dict['image_path'] + "\n"
+                  + "width:" + str(image_dict['image'].width) + " height:" + str(image_dict['image'].height) + "\n"
+                  + " Image shape:" + str(np.array(image_dict['image']).shape))
+        plt.show()
+
+    @staticmethod
+    def show_random_images(data):
         torch.manual_seed(42)
         fig = plt.figure(figsize=(16, 8))
         rows, cols = 4, 4
@@ -124,15 +133,11 @@ class Plotter:
         plt.show()
 
     @staticmethod
-    def show_random_image(image_path: Path):
-        random.seed(42)
-        image_path_list = list(image_path.glob("*/*/*.jpg"))
-        random_image_path = random.choice(image_path_list)
-        image_class = random_image_path.parent.stem
-        image = Image.open(random_image_path)
+    def show_image_from_dict(image_dict):
+        image = image_dict['image']
         img_as_array = np.array(image)
         Plotter.show_image(image,
-                           image_class,
-                           str(random_image_path) + "\n"
+                           image_dict['image_path'].parent.stem,
+                           str(image_dict['image_path']) + "\n"
                            + "width:" + str(image.width) + " height:" + str(image.height) + "\n"
                            + " Image shape:" + str(img_as_array.shape))
