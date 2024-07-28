@@ -4,16 +4,15 @@ import zipfile
 from pathlib import Path
 from typing import Tuple
 
+import torch
 import torchvision.datasets
 from PIL import Image
-from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from torchvision.datasets import ImageFolder
 
 from util.plotter import Plotter
-from .image_folder_dataset import ImageFolderDataset
 from util.wget import Wget
-from util.file_utils import get_class_names
+from .image_folder_dataset import ImageFolderDataset
 
 
 def get_random_image(image_path):
@@ -24,12 +23,35 @@ def get_random_image(image_path):
     return image_dict
 
 
+def read_image_to_device(image_path, device):
+    image = torchvision.io.read_image(str(image_path)).type(torch.float32)
+    image = image / 255.
+    data_transform = transforms.Compose([
+        transforms.Resize((64, 64)),
+    ])
+    image_tensor = data_transform(image)
+    image_tensor = torch.unsqueeze(image_tensor, dim=0)
+    return image_tensor.to(device)
+
+
+def get_data_transform():
+    data_transform = transforms.Compose([
+        transforms.Resize((64, 64)),
+        # transforms.CenterCrop(64),
+        # transforms.TrivialAugmentWide(num_magnitude_bins=31),
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.ToTensor()
+    ])
+    return data_transform
+
+
 def load_dataset(images_path: str, download_url: str) -> Tuple[ImageFolder, ImageFolder]:
     """
     The data we're going to be using is a subset of the Food101 dataset.
     Subset contains 3 classes of food and 1000 images pres class (750 training 250 testing).
     Food101 is popular computer vision benchmark as it contains 1000 images of 101 different kinds of foods,
     totaling 101,000 images (75,750 train and 25,250 test).
+    imagePath - data/pizza_steak_sushi/
     """
     # Download and unzip images
     data_path = Path(images_path).parent
@@ -53,9 +75,9 @@ def load_dataset(images_path: str, download_url: str) -> Tuple[ImageFolder, Imag
 
     # Will transform our images to tensors
     data_transform = transforms.Compose([
-        transforms.Resize(64),
-        transforms.CenterCrop(64),
-        transforms.TrivialAugmentWide(num_magnitude_bins=31),
+        transforms.Resize((64, 64)),
+        # transforms.CenterCrop(64),
+        # transforms.TrivialAugmentWide(num_magnitude_bins=31),
         transforms.RandomHorizontalFlip(p=0.5),
         transforms.ToTensor()
     ])
@@ -63,7 +85,8 @@ def load_dataset(images_path: str, download_url: str) -> Tuple[ImageFolder, Imag
     # Check transformed image
     image = get_random_image(image_path)
     image_tensor = data_transform(image['image'])
-    Plotter.show_image(image_tensor.permute(1, 2, 0), image['image_path'], str(image['image_path'].parent.stem))
+
+    # Plotter.show_image(image_tensor.permute(1, 2, 0), image['image_path'], str(image['image_path'].parent.stem))
 
     # Create datasets with ImageFolder
     train_dir = image_path / "train"
@@ -78,7 +101,7 @@ def load_dataset(images_path: str, download_url: str) -> Tuple[ImageFolder, Imag
     # print(train_data.class_to_idx)  # {'pizza': 0, 'steak': 1, 'sushi': 2}
     # print(train_data.samples[0])  # ('data/pizza_steak_sushi/train/pizza/1008844.jpg', 0)
     # print(train_data[0][0].shape)  # torch.Size([3, 64, 64])
-    # Plotter.show_image(train_data[0][0].permute(1, 2, 0), train_data.classes[0], str(train_data[0][1]))
+    Plotter.show_image(train_data[0][0].permute(1, 2, 0), train_data.classes[0], str(train_data[0][1]))
 
     # The same using custom dataset
     train_data_custom = ImageFolderDataset(target_dir=train_dir,

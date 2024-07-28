@@ -1,6 +1,6 @@
 # Basic machine learning tasks with PyTorch
 
-The course: https://www.learnpytorch.io
+From https://www.learnpytorch.io:
 
 - Linear regression - [linear_regression](linear_regression)
 - Binary classification - [binary_classification](bin_classification)
