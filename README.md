@@ -1,8 +1,9 @@
 # Basic machine learning tasks with PyTorch
 
 From https://www.learnpytorch.io:
-
-- Linear regression - [linear_regression](linear_regression)
-- Binary classification - [binary_classification](bin_classification)
-- Multi-class classification - [multiclass_classification](multi_classification)
-- Multi-class classification with CNN - [multiclass_classification_cnn](multi_class_cnn)
+- [Linear regression](linear_regression)
+- [Binary classification](bin_classification)
+- [Multi-class classification](multi_classification)
+- [Multi-class classification with CNN](multi_class_cnn)
+- [Multi-class classification with CNN on another dataset](multi_class_cnn_custom_dataset)
+- [Multi-class classification with ViT](multi_class_vit)
