@@ -6,4 +6,4 @@ From https://www.learnpytorch.io:
 - [Multi-class classification](multi_classification)
 - [Multi-class classification with CNN](multi_class_cnn)
 - [Multi-class classification with CNN on another dataset](multi_class_cnn_custom_dataset)
-- [Multi-class classification with ViT](multi_class_vit)
+- [Multi-class classification with ViT](multi_class_vit) - replicating the [paper](https://arxiv.org/pdf/2010.11929)
