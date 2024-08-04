@@ -7,7 +7,7 @@ import torch
 import torchvision.datasets
 from PIL import Image
 from torchvision import datasets, transforms
-from torchvision.datasets import ImageFolder
+from torchvision.datasets import ImageFolder, Food101
 
 from util.wget import Wget
 
@@ -37,10 +37,9 @@ def get_data_transform(resized_image_size: int):
     return data_transform
 
 
-def load_dataset_vit(images_path: str,
-                     download_url: str,
-                     resized_image_size: int,
-                     patch_size: int) -> Tuple[ImageFolder, ImageFolder]:
+def load_small_subset_dataset(images_path: str,
+                              download_url: str,
+                              resized_image_size: int) -> Tuple[ImageFolder, ImageFolder]:
     # Download and unzip images
     data_path = Path(images_path).parent
     image_path = Path(images_path)
@@ -66,3 +65,50 @@ def load_dataset_vit(images_path: str,
                                      target_transform=None)
 
     return train_data, test_data
+
+
+def load_full_dataset_for_selected_labels(images_path: str, resized_image_size: int, labels: []):
+    data_path = Path(images_path)
+    train_data = Food101Subset(root=data_path,
+                               split="train",
+                               download=True,
+                               labels=labels,
+                               transform=get_data_transform(resized_image_size=resized_image_size))
+    test_data = Food101Subset(root=data_path,
+                              split="test",
+                              download=True,
+                              labels=labels,
+                              transform=get_data_transform(resized_image_size=resized_image_size))
+
+    return train_data, test_data
+
+
+# Subclass Food101 to make it load all its images but only for specified labels
+class Food101Subset(Food101):
+    def __init__(self, root, split='train', transform=None, target_transform=None, download=False, labels=None):
+        super(Food101Subset, self).__init__(root, split, transform, target_transform, download)
+
+        if labels is not None:
+            indices = [i for i in range(len(self._labels)) if self.classes[self._labels[i]] in labels]
+
+            filtered_labels = []
+            filtered_image_files = []
+            filtered_classes = []
+
+            for i in indices:
+                label_i = self.get_new_label(self.classes[self._labels[i]], labels)
+                filtered_labels.append(label_i)
+                filtered_image_files.append(self._image_files[i])
+                if label_i < len(self.classes):
+                    filtered_classes.append(self.classes[self._labels[i]])
+
+            self._labels = filtered_labels
+            self._image_files = filtered_image_files
+            self.classes = filtered_classes
+            self.class_to_idx = {j: i for i, j in enumerate(self.classes)}
+
+    @staticmethod
+    def get_new_label(class_name, labels):
+        for i in range(len(labels)):
+            if labels[i] == class_name:
+                return i
