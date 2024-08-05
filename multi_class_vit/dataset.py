@@ -30,9 +30,9 @@ def read_image_to_device(image_path, resized_image_size: int, device):
 
 def get_data_transform(resized_image_size: int):
     data_transform = transforms.Compose([
-        transforms.Resize(resized_image_size),
-        transforms.CenterCrop(resized_image_size),
-        transforms.ToTensor(),
+        transforms.Resize((resized_image_size, resized_image_size)),
+        # transforms.CenterCrop(resized_image_size),
+        transforms.ToTensor()
     ])
     return data_transform
 

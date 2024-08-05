@@ -35,20 +35,21 @@ def train_step_on_batches(model: Module,
                           accuracy_fn: torchmetrics.Metric,
                           device: torch.device):
 
-    train_loss, train_acc = 0, 0
+    train_loss = 0
     model.train()
+
     for x, y in data_loader:
         x, y = x.to(device), y.to(device)
         y_pred = model.forward(x)  # Forward pass
-        train_loss = loss_fn(y_pred, y)  # Calc loss per batch
-        train_loss += train_loss  # accumulate loss with loss from previous batches
-        train_acc += accuracy_fn(torch.argmax(y_pred, dim=-1), y)
+        loss = loss_fn(y_pred, y)  # Calc loss per batch
+        train_loss += loss.item()  # accumulate loss with loss from previous batches
+        accuracy_fn(torch.argmax(y_pred, dim=-1), y)
         optimizer.zero_grad()
-        train_loss.backward()
+        loss.backward()
         optimizer.step()  # updating model parameters once per batch
 
     train_loss /= len(data_loader)  # average loss value across all batches in dataloader
-    train_acc /= len(data_loader)  # average accuracy value across all batches in dataloader
+    train_acc = accuracy_fn.compute().item()  # average accuracy value across all batches in dataloader
 
     return train_loss, train_acc
 
@@ -59,16 +60,17 @@ def test_step_on_batches(model: Module,
                          accuracy_fn: torchmetrics.Metric,
                          device: torch.device):
 
-    test_loss, test_acc = 0, 0
+    test_loss = 0
     model.eval()
+
     with torch.inference_mode():
         for x, y in data_loader:
             x, y = x.to(device), y.to(device)
             test_pred = model.forward(x)
-            test_loss += loss_fn(test_pred, y)
-            test_acc += accuracy_fn(torch.argmax(test_pred, dim=-1), y)
+            test_loss += loss_fn(test_pred, y).item()
+            accuracy_fn(torch.argmax(test_pred, dim=-1), y)
         test_loss /= len(data_loader)
-        test_acc /= len(data_loader)
+        test_acc = accuracy_fn.compute().item()
 
     return test_loss, test_acc
 
@@ -94,10 +96,15 @@ def train(model: Module,
         print(f"\nEpoch: {epoch} | Train loss: {train_loss:.4f} | Train acc: {train_acc:.4f}"
               f" | Test loss: {test_loss:.4f} | Test acc: {test_acc:.4f}")
 
-        results["train_loss"].append(train_loss.item())
-        results["train_acc"].append(train_acc.item())
-        results["test_loss"].append(test_loss.item())
-        results["test_acc"].append(test_acc.item())
+        results["train_loss"].append(train_loss)
+        results["train_acc"].append(train_acc)
+        results["test_loss"].append(test_loss)
+        results["test_acc"].append(test_acc)
+        # As we are using torchmetrics.Accuracy() and in train_step_on_batches and test_step_on_batches methods
+        # the metric keeps accumulating the correct prediction counts, we need to reset the metric at the end of each
+        # epoch.
+        accuracy_fn.reset()
+
     timer.stop_timer()
     timer.print_elapsed_time()
     del model
