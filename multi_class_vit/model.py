@@ -52,7 +52,6 @@ class MLPBlock(nn.Module):
             nn.Dropout(p=dropout),
             nn.Linear(in_features=linear_hidden_units,
                       out_features=embedding_dim),
-            nn.GELU(),
             nn.Dropout(p=dropout)
         )
 

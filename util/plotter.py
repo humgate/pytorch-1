@@ -96,7 +96,7 @@ class Plotter:
             random_idx = torch.randint(0, len(data), size=[1]).item()
             img, lab = data[random_idx]
             fig.add_subplot(rows, cols, i)
-            plt.imshow(img.squeeze(), cmap="gray")
+            plt.imshow(img.squeeze().permute(1, 2, 0), cmap="gray")
             plt.title(data.classes[lab] + " - " + str(lab))
             plt.axis(False)
         plt.show()

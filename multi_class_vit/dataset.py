@@ -101,11 +101,12 @@ class Food101Subset(Food101):
                 filtered_labels.append(label_i)
                 filtered_image_files.append(self._image_files[i])
                 if label_i < len(self.classes):
-                    filtered_classes.append(self.classes[self._labels[i]])
+                    if not filtered_classes.__contains__(self.classes[self._labels[i]]):
+                        filtered_classes.append(self.classes[self._labels[i]])
 
             self._labels = filtered_labels
             self._image_files = filtered_image_files
-            self.classes = filtered_classes
+            self.classes = sorted(filtered_classes)
             self.class_to_idx = {j: i for i, j in enumerate(self.classes)}
 
     @staticmethod

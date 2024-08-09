@@ -5,8 +5,6 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
 
-from multi_class_vit.dataset import load_small_subset_dataset, load_full_dataset_for_selected_labels
-
 from multi_class_vit.model import ViT
 from util.model_functions import train
 from torchinfo import summary
@@ -16,23 +14,12 @@ from util.plotter import Plotter
 
 def multi_class_vit_model_operator():
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    # device = "cpu"
+
     batch_size = 256
     image_size = 28
     num_channels = 1
     num_classes = 10
     patch_size = 14
-
-    # train_data, test_data = load_small_subset_dataset(
-    #     images_path="data/large_pizza_sushi_steak_reviewed/",
-    #     download_url="https://github.com/mrdbourke/pytorch-deep-learning/raw/main/data/pizza_steak_sushi.zip",
-    #     resized_image_size=image_size)
-
-    # We will use full set (750 train and 250 test images per class) of pizza, steak and sushi from Food101 dataset
-    # train_data, test_data = load_full_dataset_for_selected_labels(
-    #     images_path="data",
-    #     resized_image_size=image_size,
-    #     labels=["pizza", "steak", "sushi"])
 
     train_data = datasets.FashionMNIST(
         root="data",
@@ -74,9 +61,9 @@ def multi_class_vit_model_operator():
     torch.manual_seed(42)
     torch.cuda.manual_seed(42)
     optimizer = torch.optim.Adam(params=vit_model.parameters(),
-                                 lr=0.001,  # Base LR from for ViT from paper
+                                 lr=0.001,
                                  betas=(0.9, 0.999),  # default values and also mentioned in ViT paper section 4.1
-                                 weight_decay=0.0001)  # from the ViT paper section 4.1 (Training & Fine-tuning)
+                                 weight_decay=0.0001)
 
     summary(vit_model, input_size=(batch_size, num_channels, image_size, image_size))
 
@@ -86,7 +73,7 @@ def multi_class_vit_model_operator():
                               loss_fn=nn.CrossEntropyLoss().to(device),
                               optimizer=optimizer,
                               accuracy_fn=torchmetrics.Accuracy("multiclass", num_classes=num_classes).to(device),
-                              epochs=30,
+                              epochs=40,
                               device=torch.device(device))
 
     Plotter.plot_loss_accuracy_curves(vit_model_results)
