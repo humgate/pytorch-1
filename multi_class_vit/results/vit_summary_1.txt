@@ -1,0 +1,49 @@
+===============================================================================================
+Layer (type:depth-idx)                        Output Shape              Param #
+===============================================================================================
+ViT                                           [256, 10]                 --
+├─Embedding: 1-1                              [256, 5, 196]             301,056
+│    └─Conv2d: 2-1                            [256, 196, 2, 2]          38,612
+│    └─Flatten: 2-2                           [256, 196, 4]             --
+├─Dropout: 1-2                                [256, 5, 196]             --
+├─Sequential: 1-3                             [256, 5, 196]             --
+│    └─TransformerEncoderBlock: 2-3           [256, 5, 196]             --
+│    │    └─MultiHeadAttentionBlock: 3-1      [256, 5, 196]             154,840
+│    │    └─MLPBlock: 3-2                     [256, 5, 196]             308,700
+│    └─TransformerEncoderBlock: 2-4           [256, 5, 196]             --
+│    │    └─MultiHeadAttentionBlock: 3-3      [256, 5, 196]             154,840
+│    │    └─MLPBlock: 3-4                     [256, 5, 196]             308,700
+│    └─TransformerEncoderBlock: 2-5           [256, 5, 196]             --
+│    │    └─MultiHeadAttentionBlock: 3-5      [256, 5, 196]             154,840
+│    │    └─MLPBlock: 3-6                     [256, 5, 196]             308,700
+│    └─TransformerEncoderBlock: 2-6           [256, 5, 196]             --
+│    │    └─MultiHeadAttentionBlock: 3-7      [256, 5, 196]             154,840
+│    │    └─MLPBlock: 3-8                     [256, 5, 196]             308,700
+│    └─TransformerEncoderBlock: 2-7           [256, 5, 196]             --
+│    │    └─MultiHeadAttentionBlock: 3-9      [256, 5, 196]             154,840
+│    │    └─MLPBlock: 3-10                    [256, 5, 196]             308,700
+│    └─TransformerEncoderBlock: 2-8           [256, 5, 196]             --
+│    │    └─MultiHeadAttentionBlock: 3-11     [256, 5, 196]             154,840
+│    │    └─MLPBlock: 3-12                    [256, 5, 196]             308,700
+│    └─TransformerEncoderBlock: 2-9           [256, 5, 196]             --
+│    │    └─MultiHeadAttentionBlock: 3-13     [256, 5, 196]             154,840
+│    │    └─MLPBlock: 3-14                    [256, 5, 196]             308,700
+│    └─TransformerEncoderBlock: 2-10          [256, 5, 196]             --
+│    │    └─MultiHeadAttentionBlock: 3-15     [256, 5, 196]             154,840
+│    │    └─MLPBlock: 3-16                    [256, 5, 196]             308,700
+├─Sequential: 1-4                             [256, 10]                 --
+│    └─Linear: 2-11                           [256, 196]                38,612
+│    └─LayerNorm: 2-12                        [256, 196]                392
+│    └─ReLU: 2-13                             [256, 196]                --
+│    └─Linear: 2-14                           [256, 10]                 1,970
+===============================================================================================
+Total params: 4,088,962
+Trainable params: 4,088,962
+Non-trainable params: 0
+Total mult-adds (M): 683.05
+===============================================================================================
+Input size (MB): 0.80
+Forward/backward pass size (MB): 114.82
+Params size (MB): 10.21
+Estimated Total Size (MB): 125.84
+===============================================================================================

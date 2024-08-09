@@ -52,6 +52,7 @@ class MLPBlock(nn.Module):
             nn.Dropout(p=dropout),
             nn.Linear(in_features=linear_hidden_units,
                       out_features=embedding_dim),
+            nn.GELU(),
             nn.Dropout(p=dropout)
         )
 
@@ -102,7 +103,7 @@ class ViT(nn.Module):
                  num_transformer_layers: int = 12,  # Layers from paper for ViT-Base
                  embedding_dim: int = 768,  # d_model for ViT-Base
                  linear_hidden_units: int = 3072,  # MLP size for ViT-Base
-                 num_heads: int = 12,  # MHA for ViT-Base
+                 num_heads: int = 8,  # MHA for ViT-Base
                  attn_dropout: float = 0,  # Dropout for attention projection
                  linear_dropout: float = 0.1,  # % of dropout for MLP layers
                  embedding_dropout: float = 0.1,  # Dropout for patch and position embeddings
@@ -135,9 +136,10 @@ class ViT(nn.Module):
 
         # Create linear classifier
         self.classifier = nn.Sequential(
-            nn.LayerNorm(normalized_shape=embedding_dim),
-            nn.Linear(in_features=embedding_dim,
-                      out_features=num_classes)
+            nn.Linear(embedding_dim, embedding_dim),
+            nn.LayerNorm(embedding_dim),
+            nn.ReLU(inplace=True),
+            nn.Linear(embedding_dim, num_classes)
         )
 
     def forward(self, x):
