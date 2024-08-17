@@ -8,6 +8,7 @@ from multi_class_cnn_custom_dataset.dataset_operator import load_dataset
 from multi_class_cnn_custom_dataset.model_operator import multi_class_cnn_model_operator
 # from multi_class_vit.model_operator_fashion_mnist import multi_class_vit_model_operator
 from multi_class_vit.model_operator_food101 import multi_class_vit_model_operator
+from fine_tuninng_multi_class_vit.fine_tuning_vit_operator import fine_tuning_vit_operator
 
 if __name__ == '__main__':
     #  linear_regression()
@@ -18,4 +19,5 @@ if __name__ == '__main__':
     #  multi_class_pred_cnn()
     #  create_custom_dataset()
     #  multi_class_cnn_model_operator()
-    multi_class_vit_model_operator()
+    #  multi_class_vit_model_operator()
+    fine_tuning_vit_operator()
