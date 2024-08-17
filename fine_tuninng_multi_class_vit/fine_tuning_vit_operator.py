@@ -43,27 +43,25 @@ def fine_tuning_vit_operator():
                                  drop_last=True)
 
     model = vit_b_16(weights=weights).to(device)
-    num_heads = model.encoder.layers[0]
-    print(f"Number of heads in the encoder: {num_heads}")
     # Replace the last linear layer output features to 3 (num_classes)
-    # out_features = model.heads[-1].in_features
-    # model.heads[-1] = nn.Linear(in_features=out_features, out_features=num_classes)
-    # summary(model, input_size=(32, 3, 224, 224))
-    #
-    # torch.manual_seed(42)
-    # torch.cuda.manual_seed(42)
-    # optimizer = torch.optim.Adam(params=model.parameters(),
-    #                              lr=0.0001,
-    #                              betas=(0.9, 0.999),
-    #                              weight_decay=0.0001)
-    #
-    # model_results = train(model=model,
-    #                       train_data_loader=train_dataloader,
-    #                       test_data_loader=test_dataloader,
-    #                       loss_fn=nn.CrossEntropyLoss().to(device),
-    #                       optimizer=optimizer,
-    #                       accuracy_fn=torchmetrics.Accuracy("multiclass", num_classes=num_classes).to(device),
-    #                       epochs=4,
-    #                       device=torch.device(device))
-    #
-    # Plotter.plot_loss_accuracy_curves(model_results)
+    out_features = model.heads[-1].in_features
+    model.heads[-1] = nn.Linear(in_features=out_features, out_features=num_classes)
+    summary(model, input_size=(32, 3, 224, 224))
+
+    torch.manual_seed(42)
+    torch.cuda.manual_seed(42)
+    optimizer = torch.optim.Adam(params=model.parameters(),
+                                 lr=0.0001,
+                                 betas=(0.9, 0.999),
+                                 weight_decay=0.0001)
+
+    model_results = train(model=model,
+                          train_data_loader=train_dataloader,
+                          test_data_loader=test_dataloader,
+                          loss_fn=nn.CrossEntropyLoss().to(device),
+                          optimizer=optimizer,
+                          accuracy_fn=torchmetrics.Accuracy("multiclass", num_classes=num_classes).to(device),
+                          epochs=4,
+                          device=torch.device(device))
+
+    Plotter.plot_loss_accuracy_curves(model_results)
